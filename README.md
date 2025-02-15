@@ -1,6 +1,4 @@
 # dify-agentic
-dify-agentic
-# AI Stack Kubernetes Deployment
 
 ## Overview
 This repository provides a streamlined way to deploy an AI stack on Kubernetes using Kustomize. The stack includes essential services such as Dify API, plugins, a sandbox environment, SSRF protection, a web interface, worker services, and database components (PostgreSQL, Redis, Weaviate). Additionally, it supports GPU-powered models through the `gpustack` component.
