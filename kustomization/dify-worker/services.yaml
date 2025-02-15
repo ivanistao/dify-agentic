@@ -1,0 +1,15 @@
+---
+# DIFY WORKER SERVICE
+apiVersion: v1
+kind: Service
+metadata:
+  name: dify-worker
+spec:
+  ports:
+    - protocol: TCP
+      port: 5001
+      targetPort: 5001
+  selector:
+    app.kubernetes.io/name: dify-worker
+    app.kubernetes.io/instance: dify-worker
+  type: ClusterIP

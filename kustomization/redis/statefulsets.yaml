@@ -1,0 +1,67 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+spec:
+  serviceName: "redis"
+  replicas: 1 # by default is 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: redis
+      app.kubernetes.io/instance: redis
+  template:
+    metadata:
+      annotations:
+        github.com/repo: https://github.com/ivanistao/dify-agentic
+      labels:
+        app.kubernetes.io/name: redis
+        app.kubernetes.io/instance: redis
+    spec:
+      terminationGracePeriodSeconds: 10
+      nodeSelector:
+        kubernetes.io/os: linux
+      serviceAccountName: redis
+      containers:
+        - name: redis
+          image: redis:6-alpine
+          ports:
+            - containerPort: 6379
+              name: redis-p
+          command:
+            [
+              "redis-server",
+              "--save",
+              "20",
+              "1",
+              "--loglevel",
+              "warning",
+              "--requirepass",
+              "$(REDIS_PASSWORD)",
+            ]
+          resources:
+            limits:
+              cpu: 500m
+              memory: 1024Mi
+            requests:
+              cpu: 100m
+              memory: 102Mi
+          env:
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redis-credentials
+                  key: redis-password
+          livenessProbe:
+            exec:
+              command:
+                - redis-cli
+                - ping
+          volumeMounts:
+            - name: redis-data
+              mountPath: /data
+      volumes:
+        - name: redis-data
+          hostPath:
+            path: /root/db/redis/data
+            type: DirectoryOrCreate

@@ -1,0 +1,17 @@
+---
+# DIFY SANDBOX SERVICE
+apiVersion: v1
+kind: Service
+metadata:
+  name: dify-sandbox
+spec:
+  ports:
+    - port: 8194
+      targetPort: 8194
+      protocol: TCP
+      name: dify-sandbox
+  type: ClusterIP
+  clusterIP: None
+  selector:
+    app.kubernetes.io/name: dify-sandbox
+    app.kubernetes.io/instance: dify-sandbox

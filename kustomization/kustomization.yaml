@@ -1,0 +1,60 @@
+# kustomization.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+# dify-api
+- dify-api/statefulsets.yaml
+- dify-api/services.yaml
+- dify-api/ingress-routes.yaml
+- dify-api/middlewares.yaml
+# dify-plugin
+- dify-plugin/statefulsets.yaml
+- dify-plugin/services.yaml
+# dify-sandbox
+- dify-sandbox/deployments.yaml
+- dify-sandbox/services.yaml
+# dify-ssrf
+- dify-ssrf/deployments.yaml
+- dify-ssrf/config-maps.yaml
+- dify-ssrf/services.yaml
+# dify-web
+- dify-web/deployments.yaml
+- dify-web/services.yaml
+- dify-web/ingress-routes.yaml
+- dify-web/middlewares.yaml
+# dify-worker
+- dify-worker/statefulsets.yaml
+- dify-worker/services.yaml
+# pgadmin
+- pgadmin/secrets.yaml
+- pgadmin/pvc.yaml
+- pgadmin/deployment.yaml
+- pgadmin/service.yaml
+# postgres
+- postgres/statefulsets.yaml
+- postgres/services.yaml
+- postgres/roles.yaml
+- postgres/secrets.yaml
+- postgres/service-accounts.yaml
+# redis
+- redis/statefulsets.yaml
+- redis/services.yaml
+- redis/roles.yaml
+- redis/secrets.yaml
+- redis/service-accounts.yaml
+# weaviate
+- weaviate/statefulsets.yaml
+- weaviate/services.yaml
+- weaviate/roles.yaml
+- weaviate/secrets.yaml
+- weaviate/service-accounts.yaml
+# gpustack
+- gpustack/deployments.yaml
+- gpustack/services.yaml
+
+labels:
+- includeSelectors: true
+  pairs:
+    app.kubernetes.io/component: server
+    app.kubernetes.io/part-of: dify-agentic

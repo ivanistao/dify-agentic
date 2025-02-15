@@ -1,0 +1,13 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dify-ssrf
+spec:
+  selector:
+    app.kubernetes.io/name: dify-ssrf
+    app.kubernetes.io/instance: dify-ssrf
+  ports:
+  - protocol: TCP
+    port: 3128
+    targetPort: 3128

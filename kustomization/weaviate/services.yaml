@@ -1,0 +1,17 @@
+---
+# DIFY WEAVIATE SERVICE
+apiVersion: v1
+kind: Service
+metadata:
+  name: weaviate
+spec:
+  selector:
+    app.kubernetes.io/name: weaviate
+    app.kubernetes.io/instance: weaviate
+  type: ClusterIP
+  clusterIP: None
+  ports:
+  - name: weaviate
+    protocol: TCP
+    port: 8080
+    targetPort: 8080

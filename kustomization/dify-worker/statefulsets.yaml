@@ -1,0 +1,134 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: dify-worker
+spec:
+  serviceName: 'dify-worker'
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: dify-worker
+      app.kubernetes.io/instance: dify-worker
+  template:
+    metadata:
+      annotations:
+        github.com/repo: https://github.com/ivanistao/dify-agentic
+      labels:
+        app.kubernetes.io/name: dify-worker
+        app.kubernetes.io/instance: dify-worker
+    spec:
+      volumes:
+        - name: dify-api-storage
+          hostPath:
+            path: /root/dify/app/api/storage
+            type: DirectoryOrCreate
+      containers:
+        - name: dify-worker
+          image: langgenius/dify-api:1.0.0-beta.1
+          ports:
+            - containerPort: 5001
+              protocol: TCP
+          env:
+            - name: MODE
+              value: worker
+            - name: LOG_LEVEL
+              value: INFO
+            - name: SECRET_KEY
+              value: 'sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+            # dify-plugin
+            - name: PLUGIN_API_KEY
+              value: lYkiYYT6owG+71oLerGzA7GXCgOT++6ovaezWAjpCjf+Sjc3ZtU+qUEi
+            - name: PLUGIN_DAEMON_URL
+              value: http://dify-plugin:5002
+            - name: PLUGIN_MAX_PACKAGE_SIZE
+              value: "52428800"
+            - name: INNER_API_KEY_FOR_PLUGIN
+              value: QaHbTe77CtuXmsfyhR7+vRjI/+XbV1AaFy691iy+kGDv2Jvy0/eAh8Y1
+            # marketplace
+            - name: MARKETPLACE_ENABLED
+              value: "false"
+            - name: MARKETPLACE_API_URL
+              value: "https://marketplace.dify.ai"
+            # Database
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: pg-username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: pg-password
+            - name: DB_HOST
+              value: postgres
+            - name: DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: pg-port
+            - name: DB_DATABASE
+              value: dify
+            # redis
+            - name: REDIS_HOST
+              value: redis
+            - name: REDIS_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: redis-credentials
+                  key: redis-port
+              # default redis username is empty
+            - name: REDIS_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: redis-credentials
+                  key: redis-username
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redis-credentials
+                  key: redis-password
+            - name: REDIS_USE_SSL
+              value: 'false'
+            - name: REDIS_DB
+              value: '0'
+            - name: CELERY_BROKER_URL
+              value: >-
+                redis://$(REDIS_USERNAME):$(REDIS_PASSWORD)@$(REDIS_HOST):$(REDIS_PORT)/1
+            # CORS
+            - name: WEB_API_CORS_ALLOW_ORIGINS
+              value: '*'
+            - name: CONSOLE_CORS_ALLOW_ORIGINS
+              value: '*'
+            # File storage
+            - name: STORAGE_TYPE
+              value: 'opendal'
+            - name: OPENDAL_SCHEME
+              value: 'fs'
+            - name: OPENDAL_FS_ROOT
+              value: 'storage'
+            - name: STORAGE_LOCAL_PATH
+              value: /app/api/storage
+            # vector database
+            - name: VECTOR_STORE
+              value: weaviate
+            - name: WEAVIATE_HOST
+              value: weaviate
+            - name: WEAVIATE_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: weaviate-credentials
+                  key: weaviate-port
+            - name: WEAVIATE_ENDPOINT
+              value: http://$(WEAVIATE_HOST):$(WEAVIATE_PORT)
+            - name: WEAVIATE_API_KEY
+              value: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+          resources: {}
+          volumeMounts:
+            - name: dify-api-storage
+              mountPath: /app/api/storage
+          imagePullPolicy: IfNotPresent
+      restartPolicy: Always
+
+
+

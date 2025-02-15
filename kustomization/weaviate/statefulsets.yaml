@@ -1,0 +1,65 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: weaviate
+spec:
+  serviceName: "weaviate"
+  replicas: 1 # by default is 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: weaviate
+      app.kubernetes.io/instance: weaviate
+  template:
+    metadata:
+      annotations:
+        github.com/repo: https://github.com/ivanistao/dify-agentic
+      labels:
+        app.kubernetes.io/name: weaviate
+        app.kubernetes.io/instance: weaviate
+    spec:
+      terminationGracePeriodSeconds: 10
+      nodeSelector:
+        kubernetes.io/os: linux
+      serviceAccountName: weaviate
+      containers:
+      - name: weaviate
+        image: semitechnologies/weaviate:1.19.0
+        ports:
+        - containerPort: 8080
+          name: weaviate-p
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1024Mi
+          requests:
+            cpu: 100m
+            memory: 102Mi
+        env:
+        - name: QUERY_DEFAULTS_LIMIT
+          value: "25"
+        - name: AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED
+          value: "false"
+        - name: PERSISTENCE_DATA_PATH
+          value: "/var/lib/weaviate"
+        - name: "DEFAULT_VECTORIZER_MODULE"
+          value: 'none'
+        - name: "AUTHENTICATION_APIKEY_ENABLED"
+          value: "true"
+        - name: "AUTHENTICATION_APIKEY_ALLOWED_KEYS"
+          value: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+        - name: "AUTHENTICATION_APIKEY_USERS"
+          value: "hello@winson.dev"
+        - name: "AUTHORIZATION_ADMINLIST_ENABLED"
+          value: "true"
+        - name: "AUTHORIZATION_ADMINLIST_USERS"
+          value: "hello@winson.dev"
+
+        volumeMounts:
+        - name: weaviate-data
+          mountPath: /var/lib/weaviate
+      volumes:
+      - name: weaviate-data
+        hostPath:
+          path: /root/db/weaviate/data
+          type: DirectoryOrCreate

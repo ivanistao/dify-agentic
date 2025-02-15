@@ -1,0 +1,64 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  dify-ssrf
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: dify-ssrf
+      app.kubernetes.io/instance: dify-ssrf
+  template:
+    metadata:
+      annotations:
+        github.com/repo: https://github.com/ivanistao/dify-agentic
+      labels:
+        app.kubernetes.io/name: dify-ssrf
+        app.kubernetes.io/instance: dify-ssrf
+    spec:
+      nodeSelector:
+        kubernetes.io/os: linux
+      containers:
+      - name:  dify-ssrf
+        image:  ubuntu/squid:latest
+        command: [ "sh", "-c", "cp /tmp/docker-entrypoint-mount.sh /docker-entrypoint.sh && sed -i 's/\r$$//' /docker-entrypoint.sh && chmod +x /docker-entrypoint.sh && /docker-entrypoint.sh" ]
+        env:
+        - name: HTTP_PORT
+          value: "3128"
+        - name: COREDUMP_DIR
+          value: "/var/spool/squid"    
+        - name: REVERSE_PROXY_PORT
+          value: "8194"
+        - name: SANDBOX_HOST
+          value: "dify-sandbox"
+        - name: SANDBOX_PORT
+          value: "8194"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 300m
+            memory: 300Mi
+        ports:
+        - containerPort:  3128
+          name:  dify-ssrf
+        volumeMounts:
+        - name: dify-ssrf-proxy-config
+          mountPath: /etc/squid/
+        - name: dify-ssrf-proxy-entrypoint
+          mountPath: /tmp/
+      volumes:
+        - name: dify-ssrf-proxy-config
+          configMap:
+            name: dify-ssrf-proxy-config
+        - name: dify-ssrf-proxy-entrypoint
+          configMap:
+            name: dify-ssrf-proxy-entrypoint
+      restartPolicy: Always

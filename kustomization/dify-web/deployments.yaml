@@ -1,0 +1,52 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dify-web
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: dify-web
+      app.kubernetes.io/instance: dify-web
+  template:
+    metadata:
+      annotations:
+        github.com/repo: https://github.com/ivanistao/dify-agentic
+      labels:
+        app.kubernetes.io/name: dify-web
+        app.kubernetes.io/instance: dify-web
+    spec:
+      nodeSelector:
+        kubernetes.io/os: linux
+      automountServiceAccountToken: false
+      containers:
+        - name: dify-web
+          image: langgenius/dify-web:1.0.0-beta.1
+          env:
+            - name: EDITION
+              value: SELF_HOSTED
+            - name: CONSOLE_API_URL
+              value: 'http://dify-api.default.svc.cluster.local:5001'
+            - name: APP_API_URL
+              value: 'http://dify-api.default.svc.cluster.local:5001'
+            - name: TEXT_GENERATION_TIMEOUT_MS
+              value: "60000"
+            - name: MARKETPLACE_API_URL
+              value: "https://marketplace.dify.ai"
+            - name: MARKETPLACE_URL
+              value: "https://marketplace.dify.ai"
+            - name: TOP_K_MAX_VALUE
+              value: "10"
+
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 1Gi
+          ports:
+            - containerPort: 3000
+          imagePullPolicy: IfNotPresent

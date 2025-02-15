@@ -1,0 +1,47 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gpustack
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: gpustack
+      app.kubernetes.io/instance: gpustack
+  template:
+    metadata:
+      annotations:
+        github.com/repo: https://github.com/ivanistao/dify-agentic
+      labels:
+        app.kubernetes.io/name: gpustack
+        app.kubernetes.io/instance: gpustack
+    spec:
+      nodeSelector:
+        kubernetes.io/os: linux
+      automountServiceAccountToken: false
+      containers:
+        - name: gpustack
+          image: gpustack/gpustack:latest-cpu
+          command: [ "gpustack", "start", "--port", "80" ]
+          resources:
+            requests:
+              cpu: 1000m
+              memory: 1Gi
+            limits:
+              cpu: 4000m
+              memory: 8Gi
+          ports:
+            - containerPort: 80
+            - containerPort: 10150
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: gpustack-storage
+              mountPath: /var/lib/gpustack
+
+      volumes:
+        - name: gpustack-storage
+          hostPath:
+            path: /root/gpustack
+            type: DirectoryOrCreate

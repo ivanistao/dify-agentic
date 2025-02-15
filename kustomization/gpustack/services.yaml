@@ -1,0 +1,21 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gpustack
+spec:
+  ports:
+    - port: 3080
+      targetPort: 80
+      protocol: TCP
+      name: web
+    - port: 10150
+      targetPort: 10150
+      protocol: TCP
+      name: worker
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: gpustack
+    app.kubernetes.io/instance: gpustack
+
+

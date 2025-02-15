@@ -1,0 +1,29 @@
+# Traefik Middleware for Ingress
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: dify-web-cors
+spec:
+  headers:
+    accessControlAllowCredentials: true
+    accessControlAllowMethods:
+      - "GET"
+      - "OPTIONS"
+      - "PUT"
+      - "POST"
+      - "DELETE"
+      - "PATCH"
+    accessControlAllowHeaders:
+      # - "*"
+      - "Content-Type"
+      - "authorization"
+    accessControlAllowOriginList:
+      - "*"
+      # - "https://consoleapi.example.com"
+      # - "https://dify.example.com"
+      # - "https://difyapi.example.com"
+      # - "https://difyapp.example.com"
+      # - "https://appapi.example.com"
+    accessControlMaxAge: 100
+    addVaryHeader: true

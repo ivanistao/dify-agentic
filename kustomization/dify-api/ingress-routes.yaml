@@ -1,0 +1,37 @@
+---
+# Traefik Ingress Route without nginx reverse proxy
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: dify-api
+spec:
+  entryPoints:
+    - web
+    # - websecure
+  routes:
+    - kind: Rule
+      # service api url
+      match: Host(`dify-api.default.svc.cluster.local:5001`) && PathPrefix(`/`)
+      middlewares:
+        - name: dify-api-cors
+      services:
+        - name: dify-api
+          port: 5001
+    - kind: Rule
+      # console api url
+      match: Host(`dify-api.default.svc.cluster.local:5001`) && PathPrefix(`/`)
+      middlewares:
+        - name: dify-api-cors
+      services:
+        - name: dify-api
+          port: 5001
+    - kind: Rule
+      # app api url
+      match: Host(`dify-api.default.svc.cluster.local:5001`) && PathPrefix(`/`)
+      middlewares:
+        - name: dify-api-cors
+      services:
+        - name: dify-api
+          port: 5001
+  # tls:
+  #   secretName: dify-tls

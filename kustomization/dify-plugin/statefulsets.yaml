@@ -1,0 +1,114 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: dify-plugin
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  minReadySeconds: 10
+  serviceName: dify-plugin
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: dify-plugin
+      app.kubernetes.io/instance: dify-plugin
+  template:
+    metadata:
+      annotations:
+        github.com/repo: https://github.com/ivanistao/dify-agentic
+      labels:
+        app.kubernetes.io/name: dify-plugin
+        app.kubernetes.io/instance: dify-plugin
+    spec:
+      nodeSelector:
+        kubernetes.io/os: linux
+      containers:
+        - name: dify-plugin
+          image: langgenius/dify-plugin-daemon:0.0.1-local
+          env:
+            - name: SERVER_PORT
+              value: "5002"
+            - name: SERVER_KEY
+              value: lYkiYYT6owG+71oLerGzA7GXCgOT++6ovaezWAjpCjf+Sjc3ZtU+qUEi
+            - name: MAX_PLUGIN_PACKAGE_SIZE
+              value: "52428800"
+            - name: PPROF_ENABLED
+              value: "false"
+            - name: DIFY_INNER_API_URL
+              value: "http://dify-api.default.svc.cluster.local:5001"
+            - name: DIFY_INNER_API_KEY
+              value: QaHbTe77CtuXmsfyhR7+vRjI/+XbV1AaFy691iy+kGDv2Jvy0/eAh8Y1
+            - name: PLUGIN_REMOTE_INSTALLING_HOST
+              value: 0.0.0.0
+            - name: PLUGIN_REMOTE_INSTALLING_PORT
+              value: "5003"
+            - name: PLUGIN_WORKING_PATH
+              value: /app/storage/cwd
+            # Database plugin
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: pg-username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: pg-password
+            - name: DB_HOST
+              value: postgres
+            - name: DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: pg-port
+            - name: DB_DATABASE
+              value: dify-plugin
+              # redis
+            - name: REDIS_HOST
+              value: redis
+            - name: REDIS_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: redis-credentials
+                  key: redis-port
+              # default redis username is empty    
+            - name: REDIS_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: redis-credentials
+                  key: redis-username
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redis-credentials
+                  key: redis-password
+            - name: REDIS_USE_SSL
+              value: 'false'
+            - name: REDIS_DB
+              value: '0'
+            - name: CELERY_BROKER_URL
+              value: >-
+                redis://$(REDIS_USERNAME):$(REDIS_PASSWORD)@$(REDIS_HOST):$(REDIS_PORT)/1
+
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+            limits:
+              cpu: 1000m
+              memory: 2Gi
+          ports:
+            - containerPort: 5003
+              
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: dify-plugin-storage
+              mountPath: /app/storage
+      volumes:
+        - name: dify-plugin-storage
+          hostPath:
+            path: /root/dify/app/plugin/storage
+            type: DirectoryOrCreate
+
+
