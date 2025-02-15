@@ -1,4 +1,5 @@
-# dify-agentic
+# Dify Agentic
+[Patreon](https://www.patreon.com/example)
 
 ## Overview
 This repository provides a streamlined way to deploy an AI stack on Kubernetes using Kustomize. The stack includes essential services such as Dify API, plugins, a sandbox environment, SSRF protection, a web interface, worker services, and database components (PostgreSQL, Redis, Weaviate). Additionally, it supports GPU-powered models through the `gpustack` component.
@@ -7,7 +8,7 @@ This repository provides a streamlined way to deploy an AI stack on Kubernetes u
 - **Quick Deployment**: Easily deploy the AI stack with a single command.
 - **Modular Design**: Developers can remove `gpustack` if using external model providers.
 - **Extensibility**: Built with Kustomize, allowing easy modifications and extensions.
-- **Support Open-Source**: Contributions and donations via Giter are encouraged!
+- **Support Open-Source**: Contributions!
 
 ## Deployment Instructions
 ### Prerequisites
@@ -62,8 +63,13 @@ kubectl exec -it gpustack -- cat /var/lib/gpustack/initial_admin_password
 ```
 
 ## Support & Contributions
-We encourage developers to support this project via Giter donations. Contributions are also welcome—feel free to submit PRs or open issues for improvements!
+Contributions are also welcome—feel free to submit PRs or open issues for improvements!
+
+[Patreon](https://www.patreon.com/example)
 
 Happy coding!
+
+
+
 
 
