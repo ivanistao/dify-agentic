@@ -123,7 +123,13 @@ spec:
               value: http://$(WEAVIATE_HOST):$(WEAVIATE_PORT)
             - name: WEAVIATE_API_KEY
               value: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
-          resources: {}
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+            limits:
+              cpu: 1000m
+              memory: 2Gi
           volumeMounts:
             - name: dify-api-storage
               mountPath: /app/api/storage
